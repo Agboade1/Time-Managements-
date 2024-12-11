@@ -1,0 +1,72 @@
+// Select elements from the DOM
+const taskForm = document.querySelector('form');
+const taskNameInput = document.querySelector('#task-name');
+const taskTimeInput = document.querySelector('#task-time');
+const taskList = document.querySelector('#task-list ul');
+
+// Function to handle form submission
+taskForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const taskName = taskNameInput.value.trim();
+    const taskTime = taskTimeInput.value.trim();
+
+    if (taskName && taskTime) {
+        // Create a new task list item
+        const li = document.createElement('li');
+        li.textContent = `${taskName} - ${taskTime}`;
+
+        // Create delete icon
+        const deleteIcon = document.createElement('i');
+        deleteIcon.classList.add('fas', 'fa-trash', 'delete-icon');
+
+        // Append the delete icon to the task item
+        li.appendChild(deleteIcon);
+
+        // Append the task to the task list
+        taskList.appendChild(li);
+
+        // Clear the input fields
+        taskNameInput.value = '';
+        taskTimeInput.value = '';
+    } else {
+        alert('Please enter a task and a time.');
+    }
+});
+
+// Event listener to handle task deletion
+taskList.addEventListener('click', function (e) {
+    if (e.target && e.target.classList.contains('delete-icon')) {
+        e.target.parentElement.remove(); // Remove task on delete icon click
+    }
+});
+// Mark task as completed
+taskList.addEventListener('click', function (e) {
+    if (e.target && e.target.tagName === 'LI') {
+        e.target.classList.toggle('completed');
+    }
+});
+// Save tasks to localStorage
+function saveTasks() {
+    const tasks = [];
+    document.querySelectorAll('#task-list ul li').forEach(task => {
+        tasks.push({
+            name: task.textContent,
+            time: task.querySelector('span').textContent
+        });
+    });
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+// Load tasks from localStorage
+function loadTasks() {
+    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.textContent = `${task.name} - ${task.time}`;
+        taskList.appendChild(li);
+    });
+}
+
+// Call loadTasks when page loads
+window.addEventListener('DOMContentLoaded', loadTasks);
